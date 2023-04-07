@@ -1,9 +1,8 @@
 """The ViewController drives the visualization of the simulation.""" 
-import matplotlib
-matplotlib.use('Agg')
-from turtle import Turtle, Screen, done
+
+from turtle import Turtle, Screen, done, onclick
 from genetic_project.model import Model
-from genetic_project import constants
+from genetic_project.constants import *
 from typing import Any
 from time import time_ns
 
@@ -12,42 +11,73 @@ NS_TO_MS: int = 1000000
 
 
 class ViewController:
-    """This class is responsible for controlling the simulation and visualizing it."""
     screen: Any
     pen: Turtle
     model: Model
 
     def __init__(self, model: Model):
-        """Initialize the VC."""
         self.model = model
         self.screen = Screen()
-        self.screen.setup(constants.VIEW_WIDTH, constants.VIEW_HEIGHT)
+        self.screen.setup(VIEW_WIDTH, VIEW_HEIGHT)
         self.screen.tracer(0, 0)
         self.screen.delay(0)
-        self.screen.title("Cluster Funk v2")
+        self.screen.title("Najlepsi som")
         self.pen = Turtle()
         self.pen.hideturtle()
         self.pen.speed(0)
 
     def start_simulation(self) -> None:
-        """Call the first tick of the simulation and begin turtle gfx."""
-        self.tick()
+        for generation in range(GENERATIONS_MAX):
+            if generation % GENERATION_PRINT_RATE == 0:
+                while not self.model.is_finished():
+                    self.tick()
+                self.model = Model(self.model.breed(), self.model.batteries, self.model.walls)
+            else:
+                while not self.model.is_finished():
+                    self.model.tick()
+                self.model = Model(self.model.breed(), self.model.batteries, self.model.walls)
+
+
         done()
 
     def tick(self) -> None:
-        """Update the model state and redraw visualization."""
         start_time = time_ns() // NS_TO_MS
-        self.model.tick()
+        for _ in range(TICKS_PER_SCREEN_UPDATE):
+            self.model.tick()
         self.pen.clear()
-        for cell in self.model.population:
+
+        for w in self.model.walls:
+            draw_rec(self.pen, w.min_x, w.max_x, w.min_y, w.max_y)
+
+        for robot in self.model.robots:
             self.pen.penup()
-            self.pen.goto(cell.location.x, cell.location.y)
+            self.pen.goto(robot.location.x, robot.location.y)
+
             self.pen.pendown()
-            self.pen.color(cell.color())
-            self.pen.dot(constants.CELL_RADIUS)
+            self.pen.color("green")
+            self.pen.setheading(robot.speed.to_angle())
+            self.pen.forward(robot.speed.size() * TURTLE_SPEED_INDICATOR_CONSTANT)
+            self.pen.backward(robot.speed.size() * TURTLE_SPEED_INDICATOR_CONSTANT)
+
+            self.pen.color("red")
+            self.pen.setheading(robot.acceleration.to_angle())
+            self.pen.forward(robot.acceleration.size() * TURTLE_ACCELERATION_INDICATOR_CONSTANT)
+            self.pen.backward(robot.acceleration.size() * TURTLE_ACCELERATION_INDICATOR_CONSTANT)
+
+            self.pen.color("green" if robot.alive_status else "red")
+            self.pen.dot(ROBOT_RADIUS)
+
+        for b in self.model.batteries:
+            self.pen.penup()
+            self.pen.goto(b.location.x, b.location.y)
+            # self.pen.setheading()
+            self.pen.pendown()
+            self.pen.color("blue")
+            self.pen.dot(BATTERY_RADIUS)
+
         self.screen.update()
 
-        if self.model.is_complete():
+        if self.model.is_finished():
             return
         else:
             end_time = time_ns() // NS_TO_MS
@@ -55,3 +85,16 @@ class ViewController:
             if next_tick < 0:
                 next_tick = 0
             self.screen.ontimer(self.tick, next_tick)
+
+def draw_rec(turtle, min_x, max_x, min_y, max_y):
+    turtle.penup()
+    turtle.begin_fill()
+    turtle.color("gray")
+    turtle.goto(min_x, min_y)
+    turtle.pendown()
+    turtle.goto(max_x, min_y)
+    turtle.goto(max_x, max_y)
+    turtle.goto(min_x, max_y)
+    turtle.goto(min_x, min_y)
+    turtle.end_fill()
+    turtle.penup()
