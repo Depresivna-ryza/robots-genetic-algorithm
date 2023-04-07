@@ -72,7 +72,7 @@ class Robot:
             self.alive_status = False
     
     def tick(self, walls):
-        self.speed = self.speed * (1/2) + (self.acceleration * ACCELERATION_CONSTANT)
+        self.speed = self.speed * (1/KEEP_SPEED_CONSTANT) + (self.acceleration * ACCELERATION_CONSTANT)
         self.location = self.location + (self.speed * SPEED_CONSTANT)
         if not self.location.collides(MIN_X, MAX_X, MIN_Y, MAX_Y):
             self.alive_status = False
@@ -88,7 +88,6 @@ class Robot:
                 and b not in self.collected_batteries:
                 self.collected_batteries.add(b)
                 # print("collected")
-
                 
     def fitness(self, batteries):
         min_dist = 0
@@ -153,31 +152,32 @@ class Model:
         # weights = [x.fitness(self.batteries) for x in self.robots]
         # return choices(self.robots,weights=weights, k=NEXT_GEN_COUNT)
 
-    def breed(self):
-        candidates = self.next_gen()
-        new_gen = []
-        for _ in range(ROBOTS_COUNT):
-            a, b = choices(candidates, k=2)
-            genome = []
-            flip = True
-            for ag, bg in zip(a.genome, b.genome):
-                if randint(0, FLIP_CONSTANT) == 0:
-                    flip = not flip
-                if randint(0, 20) == 0:
-                    genome.append(random_acceleration())
-                elif flip:
-                    genome.append(ag)
-                else:
-                    genome.append(bg)
-            new_gen.append(Robot(genome))
-        return new_gen
-
     # def breed(self):
     #     candidates = self.next_gen()
     #     new_gen = []
     #     for _ in range(ROBOTS_COUNT):
-    #         a = choices(candidates, k=1)
-    #         new_gen.append(Robot(a[0].genome))
+    #         a, b = choices(candidates, k=2)
+    #         genome = []
+    #         flip = True
+    #         for ag, bg in zip(a.genome, b.genome):
+    #             if randint(0, FLIP_CONSTANT) == 0:
+    #                 flip = not flip
+    #             if randint(0, MUTATION_CONSTANAT) == 0:
+    #                 genome.append(random_acceleration())
+    #             elif flip:
+    #                 genome.append(ag)
+    #             else:
+    #                 genome.append(bg)
+    #         new_gen.append(Robot(genome))
     #     return new_gen
+
+    def breed(self):
+        weights = [x.fitness(self.batteries) for x in self.robots]
+        new_gen = choices(self.robots,weights=weights, k=ROBOTS_COUNT)
+        for a in new_gen:
+            for gi in range(len(a.genome)):
+                if randint(0, MUTATION_CONSTANT) == 0:
+                    a.genome[gi] = random_acceleration()
+
 
 
