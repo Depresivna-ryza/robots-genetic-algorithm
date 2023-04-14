@@ -56,7 +56,7 @@ class Robot:
     def __init__(self, genome):
         self.genome = genome
         self.acceleration = Point(0,0)
-        self.location = Point(MIN_X , (MIN_Y + MAX_Y)/2)
+        self.location = Point(MIN_X + 10 , (MIN_Y + MAX_Y)/2)
         self.speed = Point(0, 0)
         self.alive_status = True
         self.genome_index = 0
@@ -70,7 +70,7 @@ class Robot:
         else:
             self.alive_status = False
     
-    def tick(self, walls, target):
+    def tick(self, walls, target, ticks):
         self.speed = self.speed + self.acceleration * ACCELERATION_CONSTANT
         self.location += self.speed * SPEED_CONSTANT
         if not self.location.collides(MIN_X, MAX_X, MIN_Y, MAX_Y):
@@ -80,17 +80,23 @@ class Robot:
             if self.location.collides(w.min_x, w.max_x, w.min_y, w.max_y):
                 self.alive_status = False
                 return
-        if (self.location - target).size() <= TARGET_RADIUS:
-            self.finished = self.genome_index
+        if (self.location - target).size() <= TARGET_RADIUS // 2:
+            self.finished = ticks
             self.alive_status = False
 
    
     def fitness(self, target):
+        if self.finished is None:
+            return 1 / (self.location - target).size()
+        else:
+            return (len(self.genome)*DIRECTION_CHANGE_TICKS - self.finished) / (self.location - target).size()
+
         return (len(self.genome) - self.finished + 5 if self.finished else 1) / (self.location - target).size()
     
     def make_children(parentA, parentB, mutation_prob):
         mid = randint(0, GENOME_SIZE - 1)
         child_genome = parentA.genome[:mid] + parentB.genome[mid:]
+
         for i in range(len(child_genome)):
             if random() <= mutation_prob:
                 child_genome[i] = random_acceleration()
@@ -118,8 +124,8 @@ class Model:
         self.ticks = 0
         self.alive = True
         self.target = Point(MAX_X, ( MAX_Y + MIN_Y ) / 2)
-        self.mutation_prob = MUTATION_PROBABILITY * random()**3 if not no_mutation else 0
-
+        self.mutation_prob = MUTATION_PROBABILITY * (random()*2)**3  if not no_mutation else LOW_MUTATION_PROBABILITY
+        # self.mutation_prob = MUTATION_PROBABILITY
     def tick(self) -> None:
         self.alive = False
         if self.ticks % DIRECTION_CHANGE_TICKS == 0:
@@ -130,7 +136,7 @@ class Model:
         for r in self.robots:
             if r.alive_status:
                 self.alive = True
-                r.tick(self.walls, self.target)
+                r.tick(self.walls, self.target, self.ticks)
     
         if not self.alive:
             pass

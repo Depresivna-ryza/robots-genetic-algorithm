@@ -5,6 +5,11 @@ napr: ina fitness, exponenconalne namiesto linearne fitness,
       ine steny, viac robotov, random mutation each gen
 
 
+statistika:
+    pocet generacii na finish / pocet robotov
+    - || - / mutacie
+
+
 dna nieje zoznam akceleracii ale zoznam zaboceni akceleracie
 
 odrazanie od stien
