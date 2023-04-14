@@ -33,7 +33,10 @@ class ViewController:
             else:
                 while not self.model.is_finished():
                     self.model.tick()
-                self.model = Model(self.model.next_generation())
+                if generation % GENERATION_PRINT_RATE >= GENERATION_PRINT_RATE // 2:
+                    self.model = Model(self.model.next_generation(), NO_MUTATION_ON_PRINTED_GENERATION)
+                else:
+                    self.model = Model(self.model.next_generation())
         done()
 
     def tick(self) -> None:

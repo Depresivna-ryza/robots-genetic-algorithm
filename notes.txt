@@ -11,7 +11,11 @@ odrazanie od stien
 
 pred zaciatkom nakreslit steny
 
+nahodny pocet populacie kazdu generaciu
+
 
 
 POZOROVANIE:
+mutacia 0-0.005 priliz velka ? xd (na cik caky)
 nahodna mutacna pravdepodobnost performuje najlepsie
+EXTREMNE pomohlo nechad najlepsieho do dalsej generacie cca #1000 - #200

@@ -50,6 +50,7 @@ class Robot:
     alive_status: bool
     genome: List[int]
     genome_index: int
+    finished: None|int
     
 
     def __init__(self, genome):
@@ -59,6 +60,7 @@ class Robot:
         self.speed = Point(0, 0)
         self.alive_status = True
         self.genome_index = 0
+        self.finished = None
         #TODO: add finish time 
     
     def change_acceleration(self):
@@ -68,7 +70,7 @@ class Robot:
         else:
             self.alive_status = False
     
-    def tick(self, walls):
+    def tick(self, walls, target):
         self.speed = self.speed + self.acceleration * ACCELERATION_CONSTANT
         self.location += self.speed * SPEED_CONSTANT
         if not self.location.collides(MIN_X, MAX_X, MIN_Y, MAX_Y):
@@ -78,9 +80,13 @@ class Robot:
             if self.location.collides(w.min_x, w.max_x, w.min_y, w.max_y):
                 self.alive_status = False
                 return
-            
+        if (self.location - target).size() <= TARGET_RADIUS:
+            self.finished = self.genome_index
+            self.alive_status = False
+
+   
     def fitness(self, target):
-        return 1 / (self.location - target).size()
+        return (len(self.genome) - self.finished + 5 if self.finished else 1) / (self.location - target).size()
     
     def make_children(parentA, parentB, mutation_prob):
         mid = randint(0, GENOME_SIZE - 1)
@@ -90,8 +96,6 @@ class Robot:
                 child_genome[i] = random_acceleration()
     
         return Robot(child_genome)
-
-
 
 def random_point() -> Point:
     return Point(randint(MIN_X, MAX_X), randint(MIN_Y, MAX_Y))
@@ -108,13 +112,13 @@ class Model:
     ticks: int
     alive: bool
 
-    def __init__(self, robots = None):
+    def __init__(self, robots = None, no_mutation = False):
         self.robots = robots if robots else [Robot([random_acceleration() for _ in range(GENOME_SIZE)]) for _ in range(ROBOTS_COUNT)]
         self.walls = walls2()
         self.ticks = 0
         self.alive = True
         self.target = Point(MAX_X, ( MAX_Y + MIN_Y ) / 2)
-        self.mutation_prob = MUTATION_PROBABILITY * random()
+        self.mutation_prob = MUTATION_PROBABILITY * random()**3 if not no_mutation else 0
 
     def tick(self) -> None:
         self.alive = False
@@ -126,7 +130,7 @@ class Model:
         for r in self.robots:
             if r.alive_status:
                 self.alive = True
-                r.tick(self.walls)
+                r.tick(self.walls, self.target)
     
         if not self.alive:
             pass
@@ -140,7 +144,10 @@ class Model:
     def next_generation(self):
         res = []
         fits = [x.fitness(self.target) for x in self.robots]
-        for _ in range(ROBOTS_COUNT):
+        max_i = max(range(len(self.robots)), key= (lambda i: fits[i]))
+        print(f"max fitness value: {fits[max_i]} ", end="")
+        res.append(Robot(self.robots[max_i].genome))
+        for _ in range(ROBOTS_COUNT - 1):
             parentA, parentB = choices(self.robots, weights=fits, k=2)
             res.append(parentA.make_children(parentB, self.mutation_prob))
         return res
