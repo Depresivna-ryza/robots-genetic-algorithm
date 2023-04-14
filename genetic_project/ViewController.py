@@ -1,14 +1,10 @@
-"""The ViewController drives the visualization of the simulation.""" 
-
-from turtle import Turtle, Screen, done, onclick
+from turtle import Turtle, Screen, done, onclick, write, bgcolor
 from genetic_project.model import Model
 from genetic_project.constants import *
 from typing import Any
 from time import time_ns
 
-
 NS_TO_MS: int = 1000000
-
 
 class ViewController:
     screen: Any
@@ -25,23 +21,23 @@ class ViewController:
         self.pen = Turtle()
         self.pen.hideturtle()
         self.pen.speed(0)
+        bgcolor(0.1,0.1,0.1)
 
     def start_simulation(self) -> None:
         for generation in range(GENERATIONS_MAX):
+            print(f"generation: {generation}")
             if generation % GENERATION_PRINT_RATE == 0:
                 while not self.model.is_finished():
                     self.tick()
-                self.model = Model(self.model.breed(), self.model.batteries, self.model.walls)
+                self.model = Model(self.model.next_generation())
             else:
                 while not self.model.is_finished():
                     self.model.tick()
-                self.model = Model(self.model.breed(), self.model.batteries, self.model.walls)
-
-
+                self.model = Model(self.model.next_generation())
         done()
 
     def tick(self) -> None:
-        start_time = time_ns() // NS_TO_MS
+
         for _ in range(TICKS_PER_SCREEN_UPDATE):
             self.model.tick()
         self.pen.clear()
@@ -67,24 +63,36 @@ class ViewController:
             self.pen.color("green" if robot.alive_status else "red")
             self.pen.dot(ROBOT_RADIUS)
 
-        for b in self.model.batteries:
-            self.pen.penup()
-            self.pen.goto(b.location.x, b.location.y)
-            # self.pen.setheading()
-            self.pen.pendown()
-            self.pen.color("blue")
-            self.pen.dot(BATTERY_RADIUS)
+        # self.pen.penup()
+        # self.pen.begin_fill()
+        # self.pen.color("blue")
+        # self.pen.goto(MAX_X - 8, MIN_Y - 100)
+        # self.pen.pendown()
+        # self.pen.goto(MAX_X - 8, MAX_Y + 100)
+        # self.pen.goto(MAX_X + 8, MAX_Y + 100)
+        # self.pen.goto(MAX_X + 8, MIN_Y - 100)
+        # self.pen.goto(MAX_X - 8, MIN_Y - 100)
+        # self.pen.end_fill()
+        # self.pen.penup()
+
+        self.pen.penup()
+        self.pen.goto(self.model.target.x, self.model.target.y)
+        self.pen.pendown()
+        self.pen.color("blue")
+        self.pen.dot(TARGET_RADIUS)
+        self.pen.penup()
+
+        
+
+        self.pen.goto(MIN_X + 20, MAX_Y - 20)
+        self.pen.pendown()
+        self.pen.color("white")
+        self.pen.write(f"tick: #{self.model.ticks}", font=("Arial", 20, "normal"))
 
         self.screen.update()
 
         if self.model.is_finished():
             return
-        else:
-            end_time = time_ns() // NS_TO_MS
-            next_tick = 30 - (end_time - start_time)
-            if next_tick < 0:
-                next_tick = 0
-            self.screen.ontimer(self.tick, next_tick)
 
 def draw_rec(turtle, min_x, max_x, min_y, max_y):
     turtle.penup()

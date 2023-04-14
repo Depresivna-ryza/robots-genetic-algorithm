@@ -1,0 +1,12 @@
+statistika:
+
+menenie parametrov a skumanie ako dlho trva aby sa ustalily
+napr: ina fitness, exponenconalne namiesto linearne fitness, 
+      ine steny, viac robotov, random mutation each gen
+
+
+dna nieje zoznam akceleracii ale zoznam zaboceni akceleracie
+
+odrazanie od stien
+
+pred zaciatkom nakreslit steny
