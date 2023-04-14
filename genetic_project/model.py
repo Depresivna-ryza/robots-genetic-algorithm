@@ -82,11 +82,11 @@ class Robot:
     def fitness(self, target):
         return 1 / (self.location - target).size()
     
-    def make_children(parentA, parentB):
+    def make_children(parentA, parentB, mutation_prob):
         mid = randint(0, GENOME_SIZE - 1)
         child_genome = parentA.genome[:mid] + parentB.genome[mid:]
         for i in range(len(child_genome)):
-            if random() <= MUTATION_PROBABILITY:
+            if random() <= mutation_prob:
                 child_genome[i] = random_acceleration()
     
         return Robot(child_genome)
@@ -114,6 +114,7 @@ class Model:
         self.ticks = 0
         self.alive = True
         self.target = Point(MAX_X, ( MAX_Y + MIN_Y ) / 2)
+        self.mutation_prob = MUTATION_PROBABILITY * random()
 
     def tick(self) -> None:
         self.alive = False
@@ -141,7 +142,7 @@ class Model:
         fits = [x.fitness(self.target) for x in self.robots]
         for _ in range(ROBOTS_COUNT):
             parentA, parentB = choices(self.robots, weights=fits, k=2)
-            res.append(parentA.make_children(parentB))
+            res.append(parentA.make_children(parentB, self.mutation_prob))
         return res
             
 
@@ -161,7 +162,7 @@ def walls1():
 
 def walls2():
     res = []
-    step = 500
+    step = 300
     for min_x in range(int(MIN_X) + 100, int(MAX_X) - 100, step):
         res.append(Wall(min_x, MIN_Y, min_x + 10, (MIN_Y + MAX_Y) / 2 + 30))
     
@@ -171,6 +172,16 @@ def walls2():
 
 def walls3():
     return [Wall((MIN_X + MAX_X)/2 - 20, MIN_Y + 100 ,(MIN_X + MAX_X)/2 + 50, MAX_Y - 100)]
+
+def walls4():
+    res = []
+    step = 300
+    for min_x in range(int(MIN_X) + 100, int(MAX_X) - 100, step):
+        res.append(Wall(min_x, MIN_Y + 100 , min_x + 20, MAX_Y - 100))
+
+    for min_x in range(int(MIN_X) + 100 + step // 2, int(MAX_X) - 100, step):
+        res.append(Wall(min_x, (MIN_X + MAX_X)/2 + 50 , min_x + 20, MAX_Y))
+        res.append(Wall(min_x, MIN_Y , min_x + 20, (MIN_X + MAX_X)/2 - 50))
 
 
 

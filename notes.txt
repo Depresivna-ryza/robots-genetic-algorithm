@@ -10,3 +10,8 @@ dna nieje zoznam akceleracii ale zoznam zaboceni akceleracie
 odrazanie od stien
 
 pred zaciatkom nakreslit steny
+
+
+
+POZOROVANIE:
+nahodna mutacna pravdepodobnost performuje najlepsie
