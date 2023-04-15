@@ -155,7 +155,7 @@ class Model:
     
     def next_generation(self):
         res = []
-        fits = [x.fitness(self.target) for x in self.robots]
+        fits = [x.fitness_inverse(self.target) for x in self.robots]
         max_i = max(range(len(self.robots)), key= (lambda i: fits[i]))
         print(f"max fitness value: {fits[max_i]} ", end="")
         best = Robot(self.robots[max_i].genome)
