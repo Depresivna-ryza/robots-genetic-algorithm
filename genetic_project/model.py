@@ -101,7 +101,7 @@ class Robot:
             return max_len - (self.location - target).size() + 100 * (len(self.genome)*DIRECTION_CHANGE_TICKS - self.finished) 
 
     def fitness_quadratic(self, target):
-        return self.fitness_inverse(target) ** 2
+        return (self.fitness_inverse(target) ** 2) / 500
     
     def fitness_exponential(self, target):
         return 2 ** self.fitness_inverse(target) 
@@ -160,7 +160,7 @@ class Model:
     
     def next_generation(self):
         res = []
-        fits = [x.fitness_linear(self.target) for x in self.robots]
+        fits = [x.fitness_quadratic(self.target) for x in self.robots]
         max_i = max(range(len(self.robots)), key= (lambda i: fits[i]))
         print(f"max fitness value: {fits[max_i]} ", end="")
         best = Robot(self.robots[max_i].genome)
