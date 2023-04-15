@@ -98,10 +98,10 @@ class Robot:
         if self.finished is None:
             return max_len - (self.location - target).size()
         else:
-            return max_len - (self.location - target).size() + 100 * (len(self.genome)*DIRECTION_CHANGE_TICKS - self.finished) 
+            return max_len - (self.location - target).size() + (len(self.genome)*DIRECTION_CHANGE_TICKS - self.finished) 
 
     def fitness_quadratic(self, target):
-        return (self.fitness_inverse(target) ** 2) / 500
+        return (self.fitness_inverse(target) ** 2) 
     
     def fitness_exponential(self, target):
         return 2 ** self.fitness_inverse(target) 

@@ -23,4 +23,5 @@ nahodny pocet populacie kazdu generaciu
 POZOROVANIE:
 mutacia 0-0.005 priliz velka ? xd (na cik caky)
 nahodna mutacna pravdepodobnost performuje najlepsie
-EXTREMNE pomohlo nechad najlepsieho do dalsej generacie cca #1000 - #200
+EXTREMNE pomohlo nechad najlepsieho do dalsej generacie cca #1000 - #200 
+        EDIT: rychlejsie to sice najde ciel, ale ostane stuck na lokalnom maxime a neprekona to
