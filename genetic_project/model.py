@@ -87,9 +87,16 @@ class Robot:
             self.alive_status = False
 
    
-    def fitness(self, target):
+    def fitness_inverse(self, target):
         if self.finished is None:
             return 1 / (self.location - target).size()
+        else:
+            return (len(self.genome)*DIRECTION_CHANGE_TICKS - self.finished) / (self.location - target).size()
+    
+    def fitness_linear(self, target):
+        max_len = sqrt((MAX_X - MIN_X)** 2 + (MAX_Y - MIN_Y)** 2)
+        if self.finished is None:
+            return max_len - (self.location - target).size()
         else:
             return (len(self.genome)*DIRECTION_CHANGE_TICKS - self.finished) / (self.location - target).size()
 
@@ -152,9 +159,9 @@ class Model:
         max_i = max(range(len(self.robots)), key= (lambda i: fits[i]))
         print(f"max fitness value: {fits[max_i]} ", end="")
         best = Robot(self.robots[max_i].genome)
-        res.append(best)
-        res.append(best.make_children(best, self.mutation_prob))
-        for _ in range(ROBOTS_COUNT - 2):
+        # res.append(best)
+        # res.append(best.make_children(best, self.mutation_prob))
+        for _ in range(ROBOTS_COUNT):
             parentA, parentB = choices(self.robots, weights=fits, k=2)
             res.append(parentA.make_children(parentB, self.mutation_prob))
         return res
