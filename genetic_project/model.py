@@ -75,9 +75,11 @@ class Robot:
         self.location += self.speed * SPEED_CONSTANT
         if not self.location.collides(MIN_X, MAX_X, MIN_Y, MAX_Y):
             self.alive_status = False
+            # self.speed = self.speed * -1
             return
         for w in walls:
             if self.location.collides(w.min_x, w.max_x, w.min_y, w.max_y):
+                # self.speed = self.speed * -1
                 self.alive_status = False
                 return
         if (self.location - target).size() <= TARGET_RADIUS // 2:
@@ -124,7 +126,7 @@ class Model:
         self.ticks = 0
         self.alive = True
         self.target = Point(MAX_X, ( MAX_Y + MIN_Y ) / 2)
-        self.mutation_prob = MUTATION_PROBABILITY * (random()*2)**3  if not no_mutation else LOW_MUTATION_PROBABILITY
+        self.mutation_prob = MUTATION_PROBABILITY * (random()*2)**2  if not no_mutation else LOW_MUTATION_PROBABILITY
         # self.mutation_prob = MUTATION_PROBABILITY
     def tick(self) -> None:
         self.alive = False
@@ -138,9 +140,6 @@ class Model:
                 self.alive = True
                 r.tick(self.walls, self.target, self.ticks)
     
-        if not self.alive:
-            pass
-            # print("everything dead")
         self.ticks += 1
 
     def is_finished(self) -> bool:
@@ -152,8 +151,10 @@ class Model:
         fits = [x.fitness(self.target) for x in self.robots]
         max_i = max(range(len(self.robots)), key= (lambda i: fits[i]))
         print(f"max fitness value: {fits[max_i]} ", end="")
-        res.append(Robot(self.robots[max_i].genome))
-        for _ in range(ROBOTS_COUNT - 1):
+        best = Robot(self.robots[max_i].genome)
+        res.append(best)
+        res.append(best.make_children(best, self.mutation_prob))
+        for _ in range(ROBOTS_COUNT - 2):
             parentA, parentB = choices(self.robots, weights=fits, k=2)
             res.append(parentA.make_children(parentB, self.mutation_prob))
         return res
@@ -165,13 +166,13 @@ def walls0():
 
 def walls1():
     res = []
-    for min_x in range(int(MIN_X) + 100, int(MAX_X) - 100, 300):
-        res.append(Wall(min_x, MIN_Y, min_x + 10, (MIN_Y + MAX_Y) / 2 + 30))
+    step = 350
+    for min_x in range(int(MIN_X) + 100, int(MAX_X//2) - 100, step):
+        res.append(Wall(min_x, MIN_Y, min_x + 30, (MIN_Y + MAX_Y) / 2 + 60))
     
-    for min_x in range(int(MIN_X) + 100 + 150, int(MAX_X) - 100, 300):
-        res.append(Wall(min_x, (MIN_Y + MAX_Y) / 2 - 30, min_x + 10, MAX_Y))
+    for min_x in range(int(MIN_X) + 100 + step// 2, int(MAX_X//2) - 100, step):
+        res.append(Wall(min_x, (MIN_Y + MAX_Y) / 2 - 60, min_x + 30, MAX_Y))
     return res
-
 
 def walls2():
     res = []
@@ -184,7 +185,7 @@ def walls2():
     return res
 
 def walls3():
-    return [Wall((MIN_X + MAX_X)/2 - 20, MIN_Y + 100 ,(MIN_X + MAX_X)/2 + 50, MAX_Y - 100)]
+    return [Wall(MIN_X + 100, MIN_Y + 100 ,MAX_X - 100, MAX_Y - 100)]
 
 def walls4():
     res = []
@@ -195,6 +196,8 @@ def walls4():
     for min_x in range(int(MIN_X) + 100 + step // 2, int(MAX_X) - 100, step):
         res.append(Wall(min_x, (MIN_X + MAX_X)/2 + 50 , min_x + 20, MAX_Y))
         res.append(Wall(min_x, MIN_Y , min_x + 20, (MIN_X + MAX_X)/2 - 50))
+
+    return res
 
 
 
