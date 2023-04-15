@@ -4,6 +4,7 @@ from genetic_project.constants import *
 from typing import Any
 from time import time_ns
 
+
 NS_TO_MS: int = 1000000
 
 class ViewController:
@@ -28,7 +29,10 @@ class ViewController:
             print(f"generation: {generation}")
             if generation % GENERATION_PRINT_RATE == 0:
                 while not self.model.is_finished():
-                    self.tick()
+                    if PRINT_BEST_ONLY:
+                        self.tick_best_only()
+                    else:
+                        self.tick()
                 self.model = Model(self.model.next_generation())
             else:
                 while not self.model.is_finished():
@@ -37,8 +41,7 @@ class ViewController:
                     self.model = Model(self.model.next_generation(), NO_MUTATION_ON_PRINTED_GENERATION)
                 else:
                     self.model = Model(self.model.next_generation())
-        
-        
+
         done()
 
     def tick(self) -> None:
@@ -68,26 +71,12 @@ class ViewController:
             self.pen.color("green" if robot.alive_status else "red")
             self.pen.dot(ROBOT_RADIUS)
 
-        # self.pen.penup()
-        # self.pen.begin_fill()
-        # self.pen.color("blue")
-        # self.pen.goto(MAX_X - 8, MIN_Y - 100)
-        # self.pen.pendown()
-        # self.pen.goto(MAX_X - 8, MAX_Y + 100)
-        # self.pen.goto(MAX_X + 8, MAX_Y + 100)
-        # self.pen.goto(MAX_X + 8, MIN_Y - 100)
-        # self.pen.goto(MAX_X - 8, MIN_Y - 100)
-        # self.pen.end_fill()
-        # self.pen.penup()
-
         self.pen.penup()
         self.pen.goto(self.model.target.x, self.model.target.y)
         self.pen.pendown()
         self.pen.color("blue")
         self.pen.dot(TARGET_RADIUS)
         self.pen.penup()
-
-        
 
         self.pen.goto(MIN_X + 20, MAX_Y - 20)
         self.pen.pendown()
@@ -98,6 +87,47 @@ class ViewController:
 
         if self.model.is_finished():
             return
+        
+
+    def tick_best_only(self) -> None:
+
+        self.model.tick()
+        self.pen.clear()
+
+        for w in self.model.walls:
+            draw_rec(self.pen, w.min_x, w.max_x, w.min_y, w.max_y)
+
+        robot = self.model.robots[0]
+        self.pen.penup()
+        self.pen.goto(robot.location.x, robot.location.y)
+
+        self.pen.pendown()
+        self.pen.color("green")
+        self.pen.setheading(robot.speed.to_angle())
+        self.pen.forward(robot.speed.size() * TURTLE_SPEED_INDICATOR_CONSTANT)
+        self.pen.backward(robot.speed.size() * TURTLE_SPEED_INDICATOR_CONSTANT)
+
+        self.pen.color("red")
+        self.pen.setheading(robot.acceleration.to_angle())
+        self.pen.forward(robot.acceleration.size() * TURTLE_ACCELERATION_INDICATOR_CONSTANT)
+        self.pen.backward(robot.acceleration.size() * TURTLE_ACCELERATION_INDICATOR_CONSTANT)
+
+        self.pen.color("green" if robot.alive_status else "red")
+        self.pen.dot(ROBOT_RADIUS)
+
+        self.pen.penup()
+        self.pen.goto(self.model.target.x, self.model.target.y)
+        self.pen.pendown()
+        self.pen.color("blue")
+        self.pen.dot(TARGET_RADIUS)
+        self.pen.penup()
+
+        self.pen.goto(MIN_X + 20, MAX_Y - 20)
+        self.pen.pendown()
+        self.pen.color("white")
+        self.pen.write(f"tick: #{self.model.ticks}", font=("Arial", 20, "normal"))
+
+        self.screen.update()
 
 def draw_rec(turtle, min_x, max_x, min_y, max_y):
     turtle.penup()

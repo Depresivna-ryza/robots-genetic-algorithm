@@ -93,7 +93,7 @@ class Robot:
         else:
             return (len(self.genome)*DIRECTION_CHANGE_TICKS - self.finished) / (self.location - target).size()
 
-        return (len(self.genome) - self.finished + 5 if self.finished else 1) / (self.location - target).size()
+
     
     def make_children(parentA, parentB, mutation_prob):
         mid = randint(0, GENOME_SIZE - 1)
