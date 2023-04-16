@@ -1,10 +1,12 @@
 from __future__ import annotations
 from typing import List, Set
-from random import random, randint, choices
+from random import random, randint, choices, seed
 from genetic_project.constants import *
 from math import sin, cos, pi, atan2, sqrt
+# from genetic_project.ViewController import best_fitness
 
 
+seed(1)
 class Point:
     x: float
     y: float
@@ -37,11 +39,11 @@ class Wall:
     max_x: float
     min_y: float
     max_y: float
-    def __init__(self, a,b,c,d):
-        self.min_x = a
-        self.min_y = b
-        self.max_x = c
-        self.max_y = d
+    def __init__(self, ix,iy,ax,ay):
+        self.min_x = ix
+        self.min_y = iy
+        self.max_x = ax
+        self.max_y = ay
 
 class Robot:
     acceleration: Point
@@ -98,7 +100,7 @@ class Robot:
         if self.finished is None:
             return max_len - (self.location - target).size()
         else:
-            return max_len - (self.location - target).size() + (len(self.genome)*DIRECTION_CHANGE_TICKS - self.finished) 
+            return max_len - (self.location - target).size() + 10*(len(self.genome)*DIRECTION_CHANGE_TICKS - self.finished) 
 
     def fitness_quadratic(self, target):
         return (self.fitness_linear(target) ** 2) 
@@ -116,6 +118,22 @@ class Robot:
                 child_genome[i] = random_acceleration()
     
         return Robot(child_genome)
+    
+    def make_children2(parentA, parentB, mutation_prob):
+        mid = randint(0, GENOME_SIZE - 1)
+        child_genome = parentA.genome[:mid] + parentB.genome[mid:]
+
+        for i in range(len(child_genome)):
+            if random() <= mutation_prob:
+                x= randint(0,2)
+                if x == 0:
+                    child_genome[i] = random_acceleration() #rand
+                if x == 1:
+                    child_genome[i] = child_genome[i-1] #duplicate
+                if x == 2:
+                    child_genome[i], child_genome[i-1] = child_genome[i-1], child_genome[i] # swap
+    
+        return Robot(child_genome)
 
 def random_point() -> Point:
     return Point(randint(MIN_X, MAX_X), randint(MIN_Y, MAX_Y))
@@ -131,10 +149,11 @@ class Model:
     target: Point
     ticks: int
     alive: bool
+    best_fitness: float
 
     def __init__(self, robots = None, no_mutation = False):
         self.robots = robots if robots else [Robot([random_acceleration() for _ in range(GENOME_SIZE)]) for _ in range(ROBOTS_COUNT)]
-        self.walls = walls2()
+        self.walls = walls4()
         self.ticks = 0
         self.alive = True
         self.target = Point(MAX_X, ( MAX_Y + MIN_Y ) / 2)
@@ -166,14 +185,15 @@ class Model:
         # fits = [x.fitness_exponential(self.target) for x in self.robots]
         max_i = max(range(len(self.robots)), key= (lambda i: fits[i]))
         print(f"max fitness value: {fits[max_i]} ", end="")
+        best_fitness = fits[max_i]
+
         best = Robot(self.robots[max_i].genome)
-        # res.append(best)
         if KEEP_BEST:
             res.append(best.make_children(best, self.mutation_prob))
         for _ in range(ROBOTS_COUNT - int(KEEP_BEST)):
             parentA, parentB = choices(self.robots, weights=fits, k=2)
-            res.append(parentA.make_children(parentB, self.mutation_prob))
-        return res
+            res.append(parentA.make_children2(parentB, self.mutation_prob))
+        return res, best_fitness
             
 
 
@@ -183,10 +203,10 @@ def walls0():
 def walls1():
     res = []
     step = 350
-    for min_x in range(int(MIN_X) + 100, int(MAX_X//2) - 100, step):
+    for min_x in range(int(MIN_X) + 100, int(MAX_X//2), step):
         res.append(Wall(min_x, MIN_Y, min_x + 30, (MIN_Y + MAX_Y) / 2 + 60))
     
-    for min_x in range(int(MIN_X) + 100 + step// 2, int(MAX_X//2) - 100, step):
+    for min_x in range(int(MIN_X) + 100 + step// 2, int(MAX_X//2), step):
         res.append(Wall(min_x, (MIN_Y + MAX_Y) / 2 - 60, min_x + 30, MAX_Y))
     return res
 
@@ -205,7 +225,7 @@ def walls3():
 
 def walls4():
     res = []
-    step = 300
+    step = 400
     for min_x in range(int(MIN_X) + 100, int(MAX_X) - 100, step):
         res.append(Wall(min_x, MIN_Y + 100 , min_x + 20, MAX_Y - 100))
 

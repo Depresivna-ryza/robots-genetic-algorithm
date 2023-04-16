@@ -18,6 +18,8 @@ pred zaciatkom nakreslit steny
 
 nahodny pocet populacie kazdu generaciu
 
+mutation flips and duplications
+
 
 
 POZOROVANIE:
