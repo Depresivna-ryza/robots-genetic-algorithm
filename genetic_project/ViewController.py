@@ -27,7 +27,7 @@ class ViewController:
         input("Press Enter to continue...")
         global best_fitness
         for generation in range(GENERATIONS_MAX):
-            print(f"generation: {generation}")
+            # print(f"generation: {generation}")
             if generation % GENERATION_PRINT_RATE == 0 or generation <= PRINT_FIRST_N_GENERATIONS:
                 while not self.model.is_finished():
                     if PRINT_BEST_ONLY:
@@ -47,6 +47,7 @@ class ViewController:
                     self.model = Model(next_gen)
 
         done()
+
 
     def tick(self, generation) -> None:
 

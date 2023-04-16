@@ -153,7 +153,7 @@ class Model:
 
     def __init__(self, robots = None, no_mutation = False):
         self.robots = robots if robots else [Robot([random_acceleration() for _ in range(GENOME_SIZE)]) for _ in range(ROBOTS_COUNT)]
-        self.walls = walls4()
+        self.walls = walls5()
         self.ticks = 0
         self.alive = True
         self.target = Point(MAX_X, ( MAX_Y + MIN_Y ) / 2)
@@ -184,7 +184,7 @@ class Model:
         fits = [x.fitness_quadratic(self.target) for x in self.robots]
         # fits = [x.fitness_exponential(self.target) for x in self.robots]
         max_i = max(range(len(self.robots)), key= (lambda i: fits[i]))
-        print(f"max fitness value: {fits[max_i]} ", end="")
+        # print(f"max fitness value: {fits[max_i]} ", end="")
         best_fitness = fits[max_i]
 
         best = Robot(self.robots[max_i].genome)
@@ -228,6 +228,21 @@ def walls4():
     step = 400
     for min_x in range(int(MIN_X) + 100, int(MAX_X) - 100, step):
         res.append(Wall(min_x, MIN_Y + 50 , min_x + 20, MAX_Y - 50))
+
+    for min_x in range(int(MIN_X) + 100 + step // 2, int(MAX_X) - 100, step):
+        res.append(Wall(min_x, (MIN_X + MAX_X)/2 + 25 , min_x + 20, MAX_Y))
+        res.append(Wall(min_x, MIN_Y , min_x + 20, (MIN_X + MAX_X)/2 - 25))
+
+    return res
+
+def walls5():
+    res = []
+    step = 400
+    off = 150
+    for min_x in range(int(MIN_X) + 100, int(MAX_X) - 100, step):
+        res.append(Wall(min_x, MAX_Y - off ,       min_x + 20, MAX_Y))
+        res.append(Wall(min_x, MIN_Y + off + 50 ,  min_x + 20, MAX_Y - off - 50))
+        res.append(Wall(min_x, MIN_Y ,             min_x + 20, MIN_Y + off))
 
     for min_x in range(int(MIN_X) + 100 + step // 2, int(MAX_X) - 100, step):
         res.append(Wall(min_x, (MIN_X + MAX_X)/2 + 25 , min_x + 20, MAX_Y))
