@@ -101,10 +101,10 @@ class Robot:
             return max_len - (self.location - target).size() + (len(self.genome)*DIRECTION_CHANGE_TICKS - self.finished) 
 
     def fitness_quadratic(self, target):
-        return (self.fitness_inverse(target) ** 2) 
+        return (self.fitness_linear(target) ** 2) 
     
     def fitness_exponential(self, target):
-        return 2 ** self.fitness_inverse(target) 
+        return 2 ** self.fitness_linear(target) 
 
     
     def make_children(parentA, parentB, mutation_prob):
@@ -160,7 +160,10 @@ class Model:
     
     def next_generation(self):
         res = []
+        # fits = [x.fitness_inverse(self.target) for x in self.robots]
+        # fits = [x.fitness_linear(self.target) for x in self.robots]
         fits = [x.fitness_quadratic(self.target) for x in self.robots]
+        # fits = [x.fitness_exponential(self.target) for x in self.robots]
         max_i = max(range(len(self.robots)), key= (lambda i: fits[i]))
         print(f"max fitness value: {fits[max_i]} ", end="")
         best = Robot(self.robots[max_i].genome)
@@ -191,10 +194,10 @@ def walls2():
     res = []
     step = 300
     for min_x in range(int(MIN_X) + 100, int(MAX_X) - 100, step):
-        res.append(Wall(min_x, MIN_Y, min_x + 10, (MIN_Y + MAX_Y) / 2 + 30))
+        res.append(Wall(min_x, MIN_Y, min_x + 20, (MIN_Y + MAX_Y) / 2 + 30))
     
     for min_x in range(int(MIN_X) + 100 + step// 2, int(MAX_X) - 100, step):
-        res.append(Wall(min_x, (MIN_Y + MAX_Y) / 2 - 30, min_x + 10, MAX_Y))
+        res.append(Wall(min_x, (MIN_Y + MAX_Y) / 2 - 30, min_x + 20, MAX_Y))
     return res
 
 def walls3():
