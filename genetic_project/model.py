@@ -106,7 +106,7 @@ class Robot:
         return (self.fitness_linear(target) ** 2) 
     
     def fitness_exponential(self, target):
-        return 2 ** self.fitness_linear(target) 
+        return 2 ** (self.fitness_linear(target) / 500) 
 
     
     def make_children(parentA, parentB, mutation_prob):
@@ -157,7 +157,7 @@ class Model:
         self.ticks = 0
         self.alive = True
         self.target = Point(MAX_X, ( MAX_Y + MIN_Y ) / 2)
-        self.mutation_prob = MUTATION_PROBABILITY * (random()*2)**2  if not no_mutation else LOW_MUTATION_PROBABILITY
+        self.mutation_prob = MUTATION_PROBABILITY * (random()*2)**3  if not no_mutation else LOW_MUTATION_PROBABILITY
         # self.mutation_prob = MUTATION_PROBABILITY
     def tick(self) -> None:
         self.alive = False
@@ -227,11 +227,11 @@ def walls4():
     res = []
     step = 400
     for min_x in range(int(MIN_X) + 100, int(MAX_X) - 100, step):
-        res.append(Wall(min_x, MIN_Y + 100 , min_x + 20, MAX_Y - 100))
+        res.append(Wall(min_x, MIN_Y + 50 , min_x + 20, MAX_Y - 50))
 
     for min_x in range(int(MIN_X) + 100 + step // 2, int(MAX_X) - 100, step):
-        res.append(Wall(min_x, (MIN_X + MAX_X)/2 + 50 , min_x + 20, MAX_Y))
-        res.append(Wall(min_x, MIN_Y , min_x + 20, (MIN_X + MAX_X)/2 - 50))
+        res.append(Wall(min_x, (MIN_X + MAX_X)/2 + 25 , min_x + 20, MAX_Y))
+        res.append(Wall(min_x, MIN_Y , min_x + 20, (MIN_X + MAX_X)/2 - 25))
 
     return res
 
