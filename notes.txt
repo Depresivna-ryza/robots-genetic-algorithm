@@ -8,6 +8,7 @@ napr: ina fitness, exponenconalne namiesto linearne fitness,
 statistika:
     pocet generacii na finish / pocet robotov
     - || - / mutacie
+    rozne varianty fitness fcie (lin, kvad, inv, exp ... )
 
 
 dna nieje zoznam akceleracii ale zoznam zaboceni akceleracie

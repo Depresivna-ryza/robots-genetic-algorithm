@@ -59,12 +59,16 @@ class ViewController:
             draw_rec(self.pen, w.min_x, w.max_x, w.min_y, w.max_y)
 
         for robot in self.model.robots:
-            if not PRINT_DEAD_ROBOTS and not robot.alive_status:
-                continue
             self.pen.penup()
             self.pen.goto(robot.location.x, robot.location.y)
-
             self.pen.pendown()
+
+            if not PRINT_DEAD_ROBOTS and not robot.alive_status:
+                self.pen.color(ROBOT_COLOR if robot.alive_status else DEAD_ROBOT_COLOR)
+                self.pen.dot(ROBOT_RADIUS / 3)
+                continue
+            
+
             self.pen.color(ROBOT_SPEED_COLOR)
             self.pen.setheading(robot.speed.to_angle())
             self.pen.forward(robot.speed.size() * TURTLE_SPEED_INDICATOR_CONSTANT)
