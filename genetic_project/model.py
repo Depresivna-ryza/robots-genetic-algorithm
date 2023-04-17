@@ -125,7 +125,7 @@ class Robot:
 
         for i in range(len(child_genome)):
             if random() <= mutation_prob:
-                x= randint(0,2)
+                x = 0 #randint(0,2)
                 if x == 0:
                     child_genome[i] = random_acceleration() #rand
                 if x == 1:
@@ -237,7 +237,7 @@ def walls4():
 
 def walls5():
     res = []
-    step = 400
+    step = 170
     off = 150
     for min_x in range(int(MIN_X) + 100, int(MAX_X) - 100, step):
         res.append(Wall(min_x, MAX_Y - off ,       min_x + 20, MAX_Y))
