@@ -125,13 +125,13 @@ class Robot:
 
         for i in range(len(child_genome)):
             if random() <= mutation_prob:
-                x = 0 #randint(0,2)
+                x = randint(0,5)
                 if x == 0:
-                    child_genome[i] = random_acceleration() #rand
-                if x == 1:
                     child_genome[i] = child_genome[i-1] #duplicate
-                if x == 2:
+                elif x == 1:
                     child_genome[i], child_genome[i-1] = child_genome[i-1], child_genome[i] # swap
+                else:
+                    child_genome[i] = random_acceleration() #rand
     
         return Robot(child_genome)
 
@@ -157,7 +157,7 @@ class Model:
         self.ticks = 0
         self.alive = True
         self.target = Point(MAX_X, ( MAX_Y + MIN_Y ) / 2)
-        self.mutation_prob = MUTATION_PROBABILITY * (random()*2)**3  if not no_mutation else LOW_MUTATION_PROBABILITY
+        self.mutation_prob = MUTATION_PROBABILITY * (random()*2)**2  if not no_mutation else LOW_MUTATION_PROBABILITY
         # self.mutation_prob = MUTATION_PROBABILITY
     def tick(self) -> None:
         self.alive = False
@@ -193,6 +193,7 @@ class Model:
         for _ in range(ROBOTS_COUNT - int(KEEP_BEST)):
             parentA, parentB = choices(self.robots, weights=fits, k=2)
             res.append(parentA.make_children2(parentB, self.mutation_prob))
+
         return res, best_fitness
             
 

@@ -59,6 +59,8 @@ class ViewController:
             draw_rec(self.pen, w.min_x, w.max_x, w.min_y, w.max_y)
 
         for robot in self.model.robots:
+            if not PRINT_DEAD_ROBOTS and not robot.alive_status:
+                continue
             self.pen.penup()
             self.pen.goto(robot.location.x, robot.location.y)
 
