@@ -7,9 +7,6 @@ from genetic_project.ViewController import ViewController
 def main() -> None:
     model = Model()
     vc = ViewController(model)
-
-    
-
     vc.start_simulation()
 
 

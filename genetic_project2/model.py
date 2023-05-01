@@ -4,7 +4,7 @@ from random import random, randint, choices, seed
 import math
 from genetic_project.constants import *
 from math import sin, cos, pi, atan2, sqrt
-from genetic_project.utilities import *
+from genetic_project2.utilities import *
 
 seed(1)
 

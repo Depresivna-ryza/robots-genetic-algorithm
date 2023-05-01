@@ -1,6 +1,6 @@
 # from genetic_project import constants
-from genetic_project.model import Model
-from genetic_project.ViewController import ViewController
+from genetic_project2.model import Model
+from genetic_project2.ViewController import ViewController
 
 
 

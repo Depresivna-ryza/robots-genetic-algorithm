@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import List, Set
 from random import random, randint, choices, seed
 import math
-from genetic_project.constants import *
+from genetic_project2.constants import *
 from math import sin, cos, pi, atan2, sqrt
 
 

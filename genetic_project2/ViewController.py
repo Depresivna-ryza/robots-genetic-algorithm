@@ -1,7 +1,7 @@
 from turtle import Turtle, Screen, done, onclick, write, bgcolor, width
-from genetic_project.model import Model
-from genetic_project.constants import *
-from genetic_project.utilities import *
+from genetic_project2.model import Model
+from genetic_project2.constants import *
+from genetic_project2.utilities import *
 from typing import Any
 from time import time_ns
 
