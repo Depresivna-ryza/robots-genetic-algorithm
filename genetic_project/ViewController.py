@@ -24,7 +24,8 @@ class ViewController:
         bgcolor(0.1,0.1,0.1)
 
     def start_simulation(self) -> None:
-        input("Press Enter to continue...")
+        input("Press Enter to start simulation:")
+        print("Press Ctrl+C to stop simulation: (duh)" )
         global best_fitness
         for generation in range(GENERATIONS_MAX):
             # print(f"generation: {generation}")
@@ -58,7 +59,7 @@ class ViewController:
         for w in self.model.walls:
             draw_rec(self.pen, w.min_x, w.max_x, w.min_y, w.max_y)
 
-        for robot in self.model.robots:
+        for robot in self.model.robots[:PRINT_ROBOTS_MAX]:
             self.pen.penup()
             self.pen.goto(robot.location.x, robot.location.y)
             self.pen.pendown()

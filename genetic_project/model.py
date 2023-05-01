@@ -156,7 +156,7 @@ class Model:
 
     def __init__(self, robots = None, no_mutation = False):
         self.robots = robots if robots else [Robot([random_acceleration() for _ in range(GENOME_SIZE)]) for _ in range(ROBOTS_COUNT)]
-        self.walls = walls5()
+        self.walls = walls6()
         self.ticks = 0
         self.alive = True
         self.target = Point(MAX_X, ( MAX_Y + MIN_Y ) / 2)
@@ -205,14 +205,14 @@ class Model:
 def walls0():
     return []
 
-def walls1():
+def walls1(): #kratka mapa vhodna na ukazku profesorovy
     res = []
     step = 350
     for min_x in range(int(MIN_X) + 100, int(MAX_X//2), step):
-        res.append(Wall(min_x, MIN_Y, min_x + 30, (MIN_Y + MAX_Y) / 2 + 60))
+        res.append(Wall(min_x, MIN_Y, min_x + 50, (MIN_Y + MAX_Y) / 2 + 10))
     
     for min_x in range(int(MIN_X) + 100 + step// 2, int(MAX_X//2), step):
-        res.append(Wall(min_x, (MIN_Y + MAX_Y) / 2 - 60, min_x + 30, MAX_Y))
+        res.append(Wall(min_x, (MIN_Y + MAX_Y) / 2 - 10, min_x + 50, MAX_Y))
     return res
 
 def walls2():
@@ -254,6 +254,24 @@ def walls5():
         res.append(Wall(min_x, MIN_Y , min_x + 20, (MIN_X + MAX_X)/2 - 25))
 
     return res
+
+
+def walls6(): #kratka mapa vhodna na ukazku profesorovy
+    res = []
+    step = 450
+    off = 175
+    for min_x in range(int(MIN_X) + 100, int(MAX_X) - 100, step):
+        res.append(Wall(min_x, MAX_Y - off ,       min_x + 40, MAX_Y))
+        res.append(Wall(min_x, MIN_Y + off + 80 ,  min_x + 40, MAX_Y - off - 80))
+        res.append(Wall(min_x, MIN_Y ,             min_x + 40, MIN_Y + off))
+
+    for min_x in range(int(MIN_X) + 100 + step // 2, int(MAX_X) - 100, step):
+        res.append(Wall(min_x, (MIN_X + MAX_X)/2 + 40 , min_x + 40, MAX_Y))
+        res.append(Wall(min_x, MIN_Y , min_x + 40, (MIN_X + MAX_X)/2 - 40))
+
+    return res
+
+
 
 
 

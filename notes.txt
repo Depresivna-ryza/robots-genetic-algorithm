@@ -4,6 +4,9 @@ menenie parametrov a skumanie ako dlho trva aby sa ustalily
 napr: ina fitness, exponenconalne namiesto linearne fitness, 
       ine steny, viac robotov, random mutation each gen
 
+variacia:
+    dokreslit im ciaru, ktorej sa maju cca drzat aby to bolo efektivnejsie
+
 
 statistika:
     pocet generacii na finish / pocet robotov
