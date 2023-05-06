@@ -67,16 +67,16 @@ class Battery:
 def borders():
     res = []
     t = 10
-    res.append(Wall(MIN_X - 3*t, MIN_Y - 3*t, MIN_X + t, MAX_Y + 3*t))
-    res.append(Wall(MAX_X - t, MIN_Y - 3*t, MAX_X + 3*t, MAX_Y + 3*t))
+    res.append(Wall(MIN_X - 30*t, MIN_Y - 30*t, MIN_X + t, MAX_Y + 30*t))
+    res.append(Wall(MAX_X - t, MIN_Y - 30*t, MAX_X + 30*t, MAX_Y + 30*t))
 
-    res.append(Wall(MIN_X - 3*t, MIN_Y - 3*t, MAX_X + 3*t, MIN_Y + t))
-    res.append(Wall(MIN_X - 3*t, MAX_Y - t, MAX_X + 3*t, MAX_Y + 3*t))
+    res.append(Wall(MIN_X - 30*t, MIN_Y - 30*t, MAX_X + 30*t, MIN_Y + t))
+    res.append(Wall(MIN_X - 30*t, MAX_Y - t, MAX_X + 30*t, MAX_Y + 30*t))
     return res
 
 def walls1(): 
     res = borders()
-    size = 50
+    size = 90
     offy = 180
     offx = offy * 1.5
     mid_x = (MIN_X + MAX_X) / 2
@@ -95,7 +95,9 @@ def batteries1():
     mid_x = (MIN_X + MAX_X) / 2
     mid_y = (MIN_Y + MAX_Y) / 2
     for x, y  in [(mid_x + offx, mid_y), (mid_x - offx, mid_y),
-                  (mid_x, mid_y + offy), (mid_x, mid_y - offy)]:
+                  (mid_x, mid_y + offy), (mid_x, mid_y - offy),
+                  (mid_x + 2*offx, mid_y), (mid_x - 2*offx, mid_y),
+                  (mid_x, mid_y + 2*offy), (mid_x, mid_y - 2*offy)]:
         res.append(Battery(Point(x, y)))
     
     return res
@@ -138,7 +140,47 @@ def batteries3():
                 res.append(Battery(Point(x, y)))
     return res
 
+
+def walls4():
+    res = borders()
+    step = 200
+    size = 100
+    for x in range(int(MIN_X) , int(MAX_X), step):
+        for y in range(int(MIN_Y) , int(MAX_Y), step):
+            if randint(0,3) != 0:
+                res.append(Wall(x, y, x + size, y + size))
+    return res
+
+def batteries4():
+    res = []
+    step = 100
+    size = 50
+    for x in range(int(MIN_X) + size, int(MAX_X), step):
+        for y in range(int(MIN_Y)+ size, int(MAX_Y), step):
+            if coinflip():
+                res.append(Battery(Point(x, y)))
+    return res
+
+
+def walls5():
+    res = borders()
+    step = 220
+    size = 150
+    for x in range(int(MIN_X) , int(MAX_X) + step, step):
+        for y in range(int(MIN_Y) , int(MAX_Y) + step, step):
+            res.append(Wall(x, y, x + size, y + size))
+    return res
+
+def batteries5():
+    res = []
+    step = 110
+    size = 75
+    for x in range(int(MIN_X) + size, int(MAX_X) + step, step):
+        for y in range(int(MIN_Y)+ size, int(MAX_Y) + step, step):
+            res.append(Battery(Point(x, y)))
+    return res
+
+
 def coinflip():
     return randint(0,1) == 1
-
 

@@ -4,6 +4,7 @@ from genetic_project2.constants import *
 from genetic_project2.utilities import *
 from typing import Any
 from time import time_ns
+import pickle
 
 
 best_fitness = -1
@@ -28,17 +29,20 @@ class ViewController:
         input("Press Enter to start simulation:")
         print("Press Ctrl+C to stop simulation: (duh)" )
         global best_fitness
-        for generation in range(GENERATIONS_MAX):
-            if generation % GENERATION_PRINT_RATE == 0 or generation <= PRINT_FIRST_N_GENERATIONS:
-                while not self.model.is_finished():
-                    self.tick(generation)
-            else:
-                while not self.model.is_finished():
-                    self.model.tick()
-            next_gen , best_fitness = self.model.next_generation()
-            self.model = Model(next_gen)
-
-        done()
+        try:
+            for generation in range(GENERATIONS_MAX):
+                if generation % GENERATION_PRINT_RATE == 0 or generation <= PRINT_FIRST_N_GENERATIONS:
+                    while not self.model.is_finished():
+                        self.tick(generation)
+                else:
+                    while not self.model.is_finished():
+                        self.model.tick()
+                next_gen , best_fitness = self.model.next_generation()
+                self.model = Model(next_gen)
+        except KeyboardInterrupt:
+            if SAVE_ROBOTS:
+                with open('data2.pkl', 'wb') as outp:
+                    pickle.dump(self.model, outp, pickle.HIGHEST_PROTOCOL)
 
 
     def tick(self, generation) -> None:
@@ -46,6 +50,14 @@ class ViewController:
         for _ in range(TICKS_PER_SCREEN_UPDATE):
             self.model.tick()
         self.pen.clear()
+
+        for battery in self.model.batteries:
+            self.pen.penup()
+            self.pen.goto(battery.coords.x, battery.coords.y)
+            self.pen.pendown()
+            self.pen.color("cyan")
+            self.pen.dot(2*BATTERY_RADIUS)
+            self.pen.penup()
 
         for w in self.model.walls:
             draw_rec(self.pen, w.min_x, w.max_x, w.min_y, w.max_y)
@@ -70,22 +82,30 @@ class ViewController:
             self.pen.color(ROBOT_COLOR if robot.alive_status else DEAD_ROBOT_COLOR)
             self.pen.dot(ROBOT_RADIUS)
 
-            for (obj, dist), angle in zip(robot.distances, ROBOT_RAY_ANGLES):
-                if obj != BATTERY:
-                    continue
-                self.pen.setheading((robot.direction + Angle(angle)).to_degrees())
-                self.pen.color("pink" if obj == BATTERY else "red")
-                self.pen.forward(dist)
-                self.pen.backward(dist)
+            # for (obj, dist), angle in zip(robot.distances, ROBOT_RAY_ANGLES):
+            #     if obj != BATTERY:
+            #         continue
+            #     self.pen.setheading((robot.direction + Angle(angle)).to_degrees())
+            #     self.pen.color("pink" if obj == BATTERY else "red")
+            #     self.pen.forward(dist)
+            #     self.pen.backward(dist)
+            count = -1
+            for angle in ROBOT_FIXED_ANGLES:
+                angle = (angle + robot.direction.to_angle()) * 2 * pi
+                for dist in ROBOT_FIXED_DISTANCES:
+                    count += 1
+                    val = robot.detected_values[count]
+                    # if val == NOTHING:
+                    #     continue
 
-        for battery in self.model.batteries:
-            self.pen.penup()
-            self.pen.goto(battery.coords.x, battery.coords.y)
-            self.pen.pendown()
-            self.pen.color("pink")
-            self.pen.dot(BATTERY_RADIUS)
-            self.pen.penup()
+                    point = Point(dist*cos(angle), dist*sin(angle)) + robot.location
+                    self.pen.penup()
+                    self.pen.goto(point.x, point.y)
+                    self.pen.pendown()
+                    self.pen.color("blue" if val == BATTERY else "red" if val == WALL else "gray")
+                    self.pen.dot(4)
 
+        self.pen.penup()
         self.pen.goto(MIN_X + 20, MAX_Y - 20)
         self.pen.pendown()
         self.pen.color("white")
