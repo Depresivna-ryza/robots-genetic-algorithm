@@ -82,28 +82,28 @@ class ViewController:
             self.pen.color(ROBOT_COLOR if robot.alive_status else DEAD_ROBOT_COLOR)
             self.pen.dot(ROBOT_RADIUS)
 
-            # for (obj, dist), angle in zip(robot.distances, ROBOT_RAY_ANGLES):
-            #     if obj != BATTERY:
-            #         continue
-            #     self.pen.setheading((robot.direction + Angle(angle)).to_degrees())
-            #     self.pen.color("pink" if obj == BATTERY else "red")
-            #     self.pen.forward(dist)
-            #     self.pen.backward(dist)
-            count = -1
-            for angle in ROBOT_FIXED_ANGLES:
-                angle = (angle + robot.direction.to_angle()) * 2 * pi
-                for dist in ROBOT_FIXED_DISTANCES:
-                    count += 1
-                    val = robot.detected_values[count]
-                    # if val == NOTHING:
-                    #     continue
+            for (obj, dist), (angle, _) in zip(robot.distances, ROBOT_RAY_ANGLES):
+                if obj == NOTHING:
+                    continue
+                self.pen.setheading((robot.direction + Angle(angle)).to_degrees())
+                self.pen.color("cyan" if obj == BATTERY else "red")
+                self.pen.forward(dist)
+                self.pen.backward(dist)
+            # count = -1
+            # for angle in ROBOT_FIXED_ANGLES:
+            #     angle = (angle + robot.direction.to_angle()) * 2 * pi
+            #     for dist in ROBOT_FIXED_DISTANCES:
+            #         count += 1
+            #         val = robot.detected_values[count]
+            #         # if val == NOTHING:
+            #         #     continue
 
-                    point = Point(dist*cos(angle), dist*sin(angle)) + robot.location
-                    self.pen.penup()
-                    self.pen.goto(point.x, point.y)
-                    self.pen.pendown()
-                    self.pen.color("blue" if val == BATTERY else "red" if val == WALL else "gray")
-                    self.pen.dot(4)
+            #         point = Point(dist*cos(angle), dist*sin(angle)) + robot.location
+            #         self.pen.penup()
+            #         self.pen.goto(point.x, point.y)
+            #         self.pen.pendown()
+            #         self.pen.color("blue" if val == BATTERY else "red" if val == WALL else "gray")
+            #         self.pen.dot(4)
 
         self.pen.penup()
         self.pen.goto(MIN_X + 20, MAX_Y - 20)

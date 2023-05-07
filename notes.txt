@@ -37,3 +37,8 @@ lokalne maxima trvaju dlho kym sa prekonaju, ale stane sa to niekedy cez mutacie
 
 na zigzagoch nefunguje dobre inverzna fitness funkcia, 
 linearne funguje, kvadraticka este lepsie, exponencionalna TODO:
+
+
+mutacie experimentalne som zistoval ze priliz velka
+je chaos a nesmeruje to nikam, a zase prilz male sa
+zasekne na lokalnom maxime a nikam to nespeje

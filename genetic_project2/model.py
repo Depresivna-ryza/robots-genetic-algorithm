@@ -55,6 +55,7 @@ class Robot:
         self.alive_status = True
         self.picked_up_batteries = set()
         self.time_of_death = MAX_TICKS
+        self.direction_change = Angle(0)
     
     def collide_with_walls(self, walls: list[Wall]):
         for w in walls:
@@ -69,10 +70,18 @@ class Robot:
                 break
 
     def move(self, walls: List[Wall], batteries: List[Battery]):
-        # self.distances = self.get_ray_distances(walls, batteries)
+        self.direction += self.direction_change
+        self.direction_change = Angle(0)
+        newpoint = Point(self.speed * cos(self.direction.to_radians()),
+                         self.speed * sin(self.direction.to_radians())) + self.location
+        self.location = newpoint
+
+         
+        self.distances = self.get_ray_distances(walls, batteries)
+        new_direction = self.DNA.get_fixed(self.speed, self.distances)
         # new_direction = self.DNA.get_rays(self.speed, self.distances)
-        self.detected_values = self.get_fixed_distances(walls, batteries)
-        new_direction = self.DNA.get_fixed(self.speed, self.detected_values)
+        # self.detected_values = self.get_fixed_distances(walls, batteries)
+        # new_direction = self.DNA.get_fixed(self.speed, self.detected_values)
 
         if new_direction == UP:
             self.speed = min(SPEED_MAX, self.speed + SPEED_INCREMENT)
@@ -83,12 +92,9 @@ class Robot:
             else:
                 self.speed = max( self.speed - SPEED_INCREMENT, SPEED_MIN)
         else:
-            self.direction += Angle(ONE_ROTATION_ANGLE) if new_direction == RIGHT else Angle(-ONE_ROTATION_ANGLE)
+            self.direction_change = Angle(ONE_ROTATION_ANGLE) if new_direction == RIGHT else Angle(-ONE_ROTATION_ANGLE)
 
 
-        newpoint = Point(self.speed * cos(self.direction.to_radians()),
-                         self.speed * sin(self.direction.to_radians())) + self.location
-        self.location = newpoint
 
     def tick(self, walls: List[Wall], batteries: List[Battery]):
         self.move(walls, batteries)
@@ -99,15 +105,17 @@ class Robot:
 
     def get_ray_distances(self, walls: List[Wall], batteries: List[Battery]):
         res = []
-        for angle in ROBOT_RAY_ANGLES:
+        for angle, max_dist in ROBOT_RAY_ANGLES:
             angle = (angle + self.direction.to_angle()) * 2 * pi
-            dist = 0
+            dist = 10
             found = False
             while not found:
-                dist += RAY_DISTANCE_INCEMENT
-                if dist >= RAY_MAX_DISTANCE:
-                    res.append((WALL, RAY_MAX_DISTANCE))
+                if dist >= max_dist:
+                    res.append((NOTHING, 0))
                     found = True
+
+                if found:
+                    break
 
                 point = Point(dist*cos(angle), dist*sin(angle)) + self.location
                 for w in walls:
@@ -115,12 +123,16 @@ class Robot:
                         res.append((WALL, dist))
                         found = True
                         break
+                if found:
+                    break
 
                 for b in batteries:
                     if b.contains(point) and b not in self.picked_up_batteries:
                         res.append((BATTERY, dist))
                         found = True
                         break
+        
+                dist += RAY_DISTANCE_INCEMENT
 
         return res
 
@@ -205,9 +217,9 @@ class Model:
 
     def __init__(self, robots = None):
         self.robots = robots if robots else [Robot() for _ in range(ROBOTS_COUNT)]
-        make_walls, make_batteries = choices([(walls1, batteries1),(walls2, batteries2), (walls3, batteries3), (walls4, batteries4), (walls5, batteries5)])[0]
-        self.walls = make_walls()
-        self.batteries = make_batteries()
+        make_walls, make_batteries = choices([(borders, batteries4),(walls2, batteries2), (walls3, batteries3), (walls4, batteries4), (walls5, batteries5)])[0]
+        self.walls = walls4() #make_walls()
+        self.batteries = batteries4() #make_batteries()
         self.ticks = 0
         self.alive = True
         self.mutation_prob = MUTATION_PROBABILITY

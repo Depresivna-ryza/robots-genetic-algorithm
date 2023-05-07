@@ -54,7 +54,7 @@ class Wall:
         self.min_y = iy
         self.max_x = ax
         self.max_y = ay
-    def contains(self, point):
+    def contains(self, point: Point):
         return self.min_x <= point.x <= self.max_x and self.min_y <= point.y <= self.max_y
 
 class Battery:
@@ -96,8 +96,8 @@ def batteries1():
     mid_y = (MIN_Y + MAX_Y) / 2
     for x, y  in [(mid_x + offx, mid_y), (mid_x - offx, mid_y),
                   (mid_x, mid_y + offy), (mid_x, mid_y - offy),
-                  (mid_x + 2*offx, mid_y), (mid_x - 2*offx, mid_y),
-                  (mid_x, mid_y + 2*offy), (mid_x, mid_y - 2*offy)]:
+                  (mid_x + 1.2*offx, mid_y), (mid_x - 1.2*offx, mid_y),
+                  (mid_x, mid_y + 1.2*offy), (mid_x, mid_y -1.2*offy)]:
         res.append(Battery(Point(x, y)))
     
     return res
