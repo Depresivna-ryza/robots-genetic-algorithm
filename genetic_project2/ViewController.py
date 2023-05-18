@@ -5,6 +5,7 @@ from genetic_project2.utilities import *
 from typing import Any
 from time import time_ns
 import pickle
+import pandas as pd
 
 
 best_fitness = -1
@@ -24,6 +25,38 @@ class ViewController:
         self.pen.hideturtle()
         self.pen.speed(0)
         bgcolor(0.1,0.1,0.1)
+
+    def start_statistics_mutation(self) -> None:
+        input("Press Enter to start simulation:")
+        print("running...")
+        final_fitnesses  = []
+        global best_fitness
+        for mutation in MUTATION_STATISTICS:
+            self.model = Model()
+            self.model.mutation_prob = mutation
+            fitness_values = []
+            for generation in range(GENERATIONS_MAX):
+                print(mutation, generation)
+                while not self.model.is_finished():
+                    self.model.tick()
+                next_gen , best_fitness = self.model.next_generation()
+                self.model = Model(next_gen)
+                self.model.mutation_prob = mutation
+                fitness_values.append(best_fitness)
+            
+            final_fitnesses.append(sum(fitness_values) / len(fitness_values))
+            print(final_fitnesses[-1])
+            
+
+
+        df = pd.DataFrame({"mutation_probability" : MUTATION_STATISTICS,
+                           "final fitness" : final_fitnesses})
+        print(df)
+
+        df.to_csv("mutation_statistics")
+            
+
+
 
     def start_simulation(self) -> None:
         input("Press Enter to start simulation:")

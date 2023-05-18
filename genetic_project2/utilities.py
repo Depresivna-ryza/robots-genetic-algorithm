@@ -143,8 +143,8 @@ def batteries3():
 
 def walls4():
     res = borders()
-    step = 200
-    size = 100
+    step = 240
+    size = 120
     for x in range(int(MIN_X) , int(MAX_X), step):
         for y in range(int(MIN_Y) , int(MAX_Y), step):
             if randint(0,3) != 0:
@@ -153,8 +153,8 @@ def walls4():
 
 def batteries4():
     res = []
-    step = 100
-    size = 50
+    step = 120
+    size = 60
     for x in range(int(MIN_X) + size, int(MAX_X), step):
         for y in range(int(MIN_Y)+ size, int(MAX_Y), step):
             if coinflip():
@@ -177,6 +177,25 @@ def batteries5():
     size = 75
     for x in range(int(MIN_X) + size, int(MAX_X) + step, step):
         for y in range(int(MIN_Y)+ size, int(MAX_Y) + step, step):
+            res.append(Battery(Point(x, y)))
+    return res
+
+
+def walls6():
+    res = borders()
+    step = 200
+    size = 100
+    for x in range(int(MIN_X) , int(MAX_X), step):
+        for y in range(int(MIN_Y) , int(MAX_Y), step):
+            res.append(Wall(x, y, x + size, y + size))
+    return res
+
+def batteries6():
+    res = []
+    step = 100
+    size = 50
+    for x in range(int(MIN_X) + size, int(MAX_X), step):
+        for y in range(int(MIN_Y)+ size, int(MAX_Y), step):
             res.append(Battery(Point(x, y)))
     return res
 
