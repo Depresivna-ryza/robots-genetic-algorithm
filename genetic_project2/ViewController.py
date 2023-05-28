@@ -6,9 +6,10 @@ from typing import Any
 from time import time_ns
 import pickle
 import pandas as pd
+import math
 
 
-best_fitness = -1
+fitness = -1
 class ViewController:
     screen: Any
     pen: Turtle
@@ -20,17 +21,70 @@ class ViewController:
         self.screen.setup(VIEW_WIDTH, VIEW_HEIGHT)
         self.screen.tracer(0, 0)
         self.screen.delay(0)
-        self.screen.title("stale som najlepsi")
+        self.screen.title("Genetic Model")
         self.pen = Turtle()
         self.pen.hideturtle()
         self.pen.speed(0)
         bgcolor(0.1,0.1,0.1)
 
+    def start_simulation(self) -> None:
+        input("Press Enter to start simulation:")
+        print("Press Ctrl+C to stop simulation:" )
+        global fitness
+        try:
+            for generation in range(GENERATIONS_MAX):
+                if generation % GENERATION_PRINT_RATE == 0 or generation <= PRINT_FIRST_N_GENERATIONS:
+                    while not self.model.is_finished():
+                        self.tick(generation)
+                else:
+                    while not self.model.is_finished():
+                        self.model.tick()
+                next_gen , fitness = self.model.next_generation()
+                self.model = Model(next_gen)
+        except KeyboardInterrupt:
+            pass
+
+        if SAVE_ROBOTS:
+            with open('data2.pkl', 'wb') as outp:
+                pickle.dump(self.model, outp, pickle.HIGHEST_PROTOCOL)
+
+    def start_statistics_fitness(self) -> None:
+        input("Press Enter to start simulation:")
+        print("running...")
+        fits = []
+        generations = []
+        self.model = Model()
+        for generation in range(GENERATIONS_MAX):
+            if generation % 5 == 0:
+                self.model.walls = walls4_constant()
+                self.model.batteries = batteries4_constant()    
+
+            if generation % GENERATION_PRINT_RATE == 0:
+                while not self.model.is_finished():
+                    self.tick(generation)
+            else:
+                while not self.model.is_finished():
+                    self.model.tick()
+                    
+            next_gen , best_fitness = self.model.next_generation()
+            self.model = Model(next_gen)
+            if generation % 5 == 0:
+                fits.append(best_fitness)
+                generations.append(generation)
+                print(generation, best_fitness)
+        
+        df = pd.DataFrame({ "mutation_probability" : generations,
+                             "final fitness" : fits})
+        print(df)
+
+        df.to_csv("fitness_statistics")
+
+
     def start_statistics_mutation(self) -> None:
         input("Press Enter to start simulation:")
         print("running...")
         final_fitnesses  = []
-        global best_fitness
+        global fitness
         for mutation in MUTATION_STATISTICS:
             self.model = Model()
             self.model.mutation_prob = mutation
@@ -39,10 +93,10 @@ class ViewController:
                 print(mutation, generation)
                 while not self.model.is_finished():
                     self.model.tick()
-                next_gen , best_fitness = self.model.next_generation()
+                next_gen , fitness = self.model.next_generation()
                 self.model = Model(next_gen)
                 self.model.mutation_prob = mutation
-                fitness_values.append(best_fitness)
+                fitness_values.append(fitness)
             
             final_fitnesses.append(sum(fitness_values) / len(fitness_values))
             print(final_fitnesses[-1])
@@ -57,29 +111,7 @@ class ViewController:
             
 
 
-
-    def start_simulation(self) -> None:
-        input("Press Enter to start simulation:")
-        print("Press Ctrl+C to stop simulation: (duh)" )
-        global best_fitness
-        try:
-            for generation in range(GENERATIONS_MAX):
-                if generation % GENERATION_PRINT_RATE == 0 or generation <= PRINT_FIRST_N_GENERATIONS:
-                    while not self.model.is_finished():
-                        self.tick(generation)
-                else:
-                    while not self.model.is_finished():
-                        self.model.tick()
-                next_gen , best_fitness = self.model.next_generation()
-                self.model = Model(next_gen)
-        except KeyboardInterrupt:
-            if SAVE_ROBOTS:
-                with open('data2.pkl', 'wb') as outp:
-                    pickle.dump(self.model, outp, pickle.HIGHEST_PROTOCOL)
-
-
     def tick(self, generation) -> None:
-
         for _ in range(TICKS_PER_SCREEN_UPDATE):
             self.model.tick()
         self.pen.clear()
@@ -152,7 +184,8 @@ class ViewController:
         self.pen.goto(MIN_X + 500, MAX_Y - 20)
         self.pen.pendown()
         self.pen.color("white")
-        self.pen.write(f"best fitness: {best_fitness}", font=("Arial", 20, "normal"))
+        fit_str = "best fitness" if RETURN_BEST_FITNESS else "average fitness"
+        self.pen.write(f"{fit_str}: {fitness}", font=("Arial", 20, "normal"))
 
         self.screen.update()
 

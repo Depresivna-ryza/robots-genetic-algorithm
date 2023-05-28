@@ -42,3 +42,8 @@ linearne funguje, kvadraticka este lepsie, exponencionalna TODO:
 mutacie experimentalne som zistoval ze priliz velka
 je chaos a nesmeruje to nikam, a zase prilz male sa
 zasekne na lokalnom maxime a nikam to nespeje
+
+3D priestor rozšírenie ?
+
+observation: roboti sa po čase evolvnú tak, že zabáčajú do jednej strany (lava / prava)
+roboti sa najprv naučia nebúrať, potom začnú zbierať baterky

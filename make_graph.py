@@ -3,35 +3,59 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd 
 import statsmodels.api as sm
-from sklearn.preprocessing import PolynomialFeatures
 
 def main():
-    data = pd.read_csv('mutation_statistics5.csv') 
+    filename = "mutation_statistics5"
+    data = pd.read_csv(filename + ".csv") 
     print(data.head())
 
     X = data["mutation_probability"].tolist()
+    # X = data["generation"].tolist()
     Y = data["final fitness"].tolist()
+    # X = [i for i in range(len(Y))]
+    
+    # plt.figure().set_figwidth(12)
     ic(X, Y)
+    plt.xlabel("mutation probability")
+    plt.ylabel("total average fitness")
     plt.scatter(X, Y)
 
-    polynomial_features = PolynomialFeatures(degree=2, include_bias = True)
-    XP = polynomial_features.fit_transform(data["mutation_probability"].values.reshape((-1, 1)))
+    coeficients = np.polyfit(X,Y, deg=1)
+    mymodel = np.poly1d(coeficients)
+    myline = np.linspace(min(X), max(X), 100)
+    plt.plot(myline, mymodel(myline), color="green")
 
-    model = sm.OLS(Y,XP).fit()
+    plt.savefig(filename + ".png")
 
-    # print(model.summary(alpha=0.05))
+def main2():
+    data1 = pd.read_csv("fitness_statistics_linear.csv")
+    data2 = pd.read_csv("fitness_statistics_elitism.csv") 
 
-    X_plot = np.arange(min(X),max(X),1)
-    X_plotP = polynomial_features.fit_transform(X_plot.reshape((-1, 1)))
-    pred_ols = model.get_prediction(X_plotP)
-    iv_l = pred_ols.summary_frame(alpha=0.1)["obs_ci_lower"]
-    iv_u = pred_ols.summary_frame(alpha=0.1)["obs_ci_upper"]
-    fig, ax = plt.subplots(figsize=(8, 6))
-    ax.plot(X, Y, "o", label="data")
-    ax.plot(X_plot, pred_ols.predicted_mean, label="OLS")
-    ax.plot(X_plot, iv_u, "r--")
-    ax.plot(X_plot, iv_l, "r--")
-    plt.savefig("mutation_statistics6_graph.png")
+    X = data1["generation"].tolist()
+    Y1 = data1["final fitness"].tolist()
+    Y2 = data2["final fitness"].tolist()
+    plt.scatter(X, Y1, color="red", label="baseline")
+    plt.scatter(X, Y2, color="green", label="elitism selection")
+
+    coeficients = np.polyfit(X,Y1, deg=2)
+    mymodel = np.poly1d(coeficients)
+    myline = np.linspace(min(X), max(X), 100)
+    plt.plot(myline, mymodel(myline), color="red")
+
+    coeficients = np.polyfit(X,Y2, deg=2)
+    mymodel = np.poly1d(coeficients)
+    myline = np.linspace(min(X), max(X), 100)
+    plt.plot(myline, mymodel(myline), color="green")
+
+
+    plt.legend()
+
+    plt.xlabel("generation")
+    plt.ylabel("average fitness")
+
+    plt.savefig("analysis_elitism_selection.png")
+
+
 
 if __name__ == "__main__":
     main()

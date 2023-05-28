@@ -21,7 +21,13 @@ def statistics_mutation():
     vc = ViewController(model)
     vc.start_statistics_mutation()
 
+def statistics_fitness_over_time():
+    model = Model()
+    vc = ViewController(model)
+    vc.start_statistics_fitness()
+
 
 if __name__ == "__main__":
     # statistics_mutation()
     main()
+    # statistics_fitness_over_time()

@@ -1,9 +1,10 @@
 from __future__ import annotations
 from typing import List, Set
-from random import random, randint, choices, seed
+from random import random, randint, choices, seed, Random
 import math
 from genetic_project2.constants import *
 from math import sin, cos, pi, atan2, sqrt
+
 
 
 class Point:
@@ -26,7 +27,7 @@ class Point:
         return sqrt(self.x ** 2 + self.y ** 2)
 
 class Angle:
-    theta: float
+    theta: float # angle represented as a number between 0 and 1, where 0 represents 0 radians and 1 represents 2pi radians
     def __init__(self, t: float):
         self.theta = t - math.floor(t)
     def to_x_y(self):
@@ -142,14 +143,13 @@ def batteries3():
 
 
 def walls4():
-    res = borders()
+    res = []
     step = 240
     size = 120
     for x in range(int(MIN_X) , int(MAX_X), step):
         for y in range(int(MIN_Y) , int(MAX_Y), step):
-            if randint(0,3) != 0:
-                res.append(Wall(x, y, x + size, y + size))
-    return res
+            res.append(Wall(x, y, x + size, y + size))
+    return choices(res, k = 3 * len(res) // 4) + borders()
 
 def batteries4():
     res = []
@@ -157,9 +157,29 @@ def batteries4():
     size = 60
     for x in range(int(MIN_X) + size, int(MAX_X), step):
         for y in range(int(MIN_Y)+ size, int(MAX_Y), step):
-            if coinflip():
-                res.append(Battery(Point(x, y)))
-    return res
+            res.append(Battery(Point(x, y)))
+    return choices(res, k =  len(res) // 2)
+
+
+def walls4_constant():
+    myrand = Random(1337)
+    res = []
+    step = 240
+    size = 120
+    for x in range(int(MIN_X) , int(MAX_X), step):
+        for y in range(int(MIN_Y) , int(MAX_Y), step):
+            res.append(Wall(x, y, x + size, y + size))
+    return myrand.choices(res, k = 3 * len(res) // 4) + borders()
+
+def batteries4_constant():
+    myrand = Random(1337)
+    res = []
+    step = 120
+    size = 60
+    for x in range(int(MIN_X) + size, int(MAX_X), step):
+        for y in range(int(MIN_Y)+ size, int(MAX_Y), step):
+            res.append(Battery(Point(x, y)))
+    return myrand.choices(res, k =  len(res) // 2)
 
 
 def walls5():
