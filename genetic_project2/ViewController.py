@@ -101,8 +101,6 @@ class ViewController:
             final_fitnesses.append(sum(fitness_values) / len(fitness_values))
             print(final_fitnesses[-1])
             
-
-
         df = pd.DataFrame({"mutation_probability" : MUTATION_STATISTICS,
                            "final fitness" : final_fitnesses})
         print(df)
